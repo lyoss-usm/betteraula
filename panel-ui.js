@@ -5,6 +5,14 @@
 (function (BA) {
 
   // ------------------------------------------------------------------
+  // Enlaces y versión. Cambiar REPO_URL aquí si el repositorio se mueve
+  // (p. ej. a la organización LYOSS).
+  // ------------------------------------------------------------------
+  var REPO_URL = 'https://github.com/muitomou/betteraula';
+  var ISSUES_URL = REPO_URL + '/issues';
+  var VERSION = (chrome.runtime.getManifest && chrome.runtime.getManifest().version) || '';
+
+  // ------------------------------------------------------------------
   // CSS del panel — vive dentro del Shadow DOM, completamente aislado.
   // NOTA: las variables CSS de Moodle NO se heredan dentro del shadow.
   // Todos los valores son autónomos.
@@ -552,7 +560,7 @@
     '    ¿Te gusta Better Aula? <a href="https://link.mercadopago.cl/donacionbetteraula" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none;">Apoya el proyecto aquí</a>',
     '  </div>',
     '  <div style="margin-top:8px">',
-    '    <a href="https://github.com" target="_blank" rel="noopener">',
+    '    <a href="' + ISSUES_URL + '" target="_blank" rel="noopener noreferrer">',
     '      Reportar un problema',
     '    </a>',
     '  </div>',
