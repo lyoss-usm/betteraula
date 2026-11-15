@@ -859,12 +859,7 @@
       }
       section.style.display = 'block';
 
-      /* PASO 1 — Log obligatorio de la estructura real del objeto.
-         Estructura confirmada en codebase: { id, colors: { nav, accent, bg, border, text, navText } }
-         El console.log permite verificar en runtime si ha cambiado (ej. temas guardados desde popup.js). */
-      console.log('[BA] savedCustomThemes sample:',
-        savedThemes[0] ? JSON.stringify(savedThemes[0]) : 'vacío');
-
+      /* Estructura de cada tema: { id, colors: { nav, accent, bg, border, text, navText } } */
       /* PASO 2 — Renderizar cada ítem con la estructura HTML especificada.
          Clave real del color del swatch: theme.colors.accent (verificado en log y en codebase).
          Fallback: theme.colors.nav si accent no existe (temas muy viejos del popup). */

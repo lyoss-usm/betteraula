@@ -26,8 +26,6 @@
  * BA._onNavTextChange    — callback para que ThemeEngine notifique cambios
  */
 
-console.log('[BetterAula] content.js orquestador cargado.');
-
 // ------------------------------------------------------------------
 // Namespace guard — por si content.js se carga antes que los módulos
 // (no debería ocurrir gracias al orden en manifest.json, pero defensivo)
@@ -412,7 +410,7 @@ function processAndPaint(element, imagePath) {
         imageCache[imagePath] = base64Data;
         paintElement(element, base64Data);
       })
-      .catch(function (e) { console.warn('[BetterAula] Foto custom no hallada en DB', e); });
+      .catch(function () { /* imagen custom no encontrada en la DB: se deja la imagen original */ });
     return;
   }
 
