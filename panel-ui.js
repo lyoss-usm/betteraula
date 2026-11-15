@@ -377,7 +377,7 @@
     '}',
 
     '.ba-show-btn {',
-    '  background: #22c55e;',
+    '  background: #15803d;',
     '  color: white;',
     '  border: none;',
     '  border-radius: 6px;',
@@ -388,7 +388,7 @@
     '  flex-shrink: 0;',
     '  transition: background 0.15s;',
     '}',
-    '.ba-show-btn:hover { background: #16a34a; }',
+    '.ba-show-btn:hover { background: #166534; }',
 
     '#ba-no-hidden-msg {',
     '  font-size: 13px;',
@@ -432,6 +432,14 @@
     '}',
     '#ba-panel.ba-panel-dark .ba-select {',
     '  border-color: rgba(255,255,255,0.15);',
+    '  color: #f9fafb;',
+    '  background-color: #1f2937;',
+    '}',
+    /* Las listas desplegables nativas no heredan el fondo del panel:
+       sin esto se veían blancas con texto blanco en modo oscuro. */
+    '#ba-panel.ba-panel-dark { color-scheme: dark; }',
+    '#ba-panel.ba-panel-dark .ba-select option {',
+    '  background-color: #1f2937;',
     '  color: #f9fafb;',
     '}',
     '#ba-panel.ba-panel-dark .ba-time-input {',
