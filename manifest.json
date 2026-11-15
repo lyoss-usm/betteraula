@@ -42,7 +42,6 @@
     {
       "resources": [
         "images/*",
-        "assets/presets/*",
         "logousmletrasblancas.png"
       ],
       "matches": [
