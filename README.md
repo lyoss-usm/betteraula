@@ -45,19 +45,22 @@ Si deseas compilar la extensión o probarla en modo desarrollador:
 
 ## Contribución
 
-Better Aula es un proyecto mantenido por y para la comunidad estudiantil. Si deseas colaborar con el desarrollo, optimizar código o integrar nuevas características, eres más que bienvenid@.
+Better Aula es un proyecto de código abierto mantenido por y para la comunidad estudiantil. Toda ayuda es bienvenida.
 
-*   Si encuentras un error, por favor abre un **Issue** documentando los pasos para reproducirlo.
-*   Si deseas contribuir con código, siéntete libre de hacer un fork del repositorio y enviar un **Pull Request**. Asegúrate de mantener un estilo de código limpio.
+### Reportar errores o proponer ideas
+*   Abre un **Issue** en el repositorio describiendo qué pasó, los pasos para reproducirlo, el navegador y su versión y, si puedes, una captura (sin datos personales: tapa tu nombre, RUT o correo).
 
-## Apoya el Proyecto
-
-El desarrollo, mantenimiento y soporte continuo de Better Aula requiere tiempo y esfuerzo. Si esta herramienta ha mejorado tu experiencia diaria en el estudio y deseas apoyar su desarrollo continuo, puedes realizar una donación.
-
-[Apoya el proyecto aquí](https://link.mercadopago.cl/donacionbetteraula)
+### Contribuir con código
+1.  Haz un fork del repositorio y crea una rama descriptiva (`fix/selector-navbar`, `feat/tema-login`, etc.).
+2.  Carga la extensión sin empaquetar (ver *Instalación para Desarrolladores*) y prueba tus cambios en Aula.
+3.  Mantén el estilo del proyecto: JavaScript sin dependencias, un módulo por responsabilidad bajo el namespace `window.BetterAula`, y nada de `console.log` en el código final.
+4.  Nunca leas, guardes ni envíes credenciales, cookies o `sesskey` de Moodle: toda la información debe quedarse en el navegador del usuario.
+5.  Abre un **Pull Request** explicando qué cambia y por qué.
 
 ## Licencia y Créditos
 
-**Desarrollado por Mauro Castillo.**
+**Autor original:** Mauro Castillo, quien creó y desarrolló Better Aula.
+
+Gracias a todas las personas que contribuyen con issues y pull requests.
 
 Este proyecto se distribuye bajo la [Licencia MIT](LICENSE). Eres libre de utilizar, modificar y distribuir este software, siempre y cuando se incluya la nota de derechos de autor y la licencia original.
