@@ -1,0 +1,161 @@
+# Checks de seguridad propios de Better Aula: reglas de la extensión (Semgrep +
+# manifest), linter de Mozilla y búsqueda de secretos.
+#
+# Por qué pull_request_target:
+#   Con `pull_request` el PR puede modificar este workflow, las reglas o los
+#   scripts y desactivar los checks. Con `pull_request_target` el workflow, las
+#   reglas (.github/semgrep), las listas permitidas (.github/security) y los
+#   scripts (.github/scripts) siempre salen de la rama base (`trusted/`). El
+#   código del PR se descarga en `pr/` y SOLO se lee como datos: nunca se
+#   ejecuta, no se instalan sus dependencias y no se usan sus archivos de
+#   configuración. El token es de solo lectura y no hay secretos.
+#
+#   Consecuencia: un cambio a las reglas o listas permitidas se aplica recién
+#   cuando se mergea. Si un PR necesita ampliar algo, primero va un PR que
+#   modifique .github/security o .github/semgrep, y después el cambio de código.
+
+name: Security guard
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] -- ver comentario arriba: el código del PR no se ejecuta
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+  HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  SEMGREP_VERSION: "1.185.0"
+  WEB_EXT_VERSION: "10.8.0"
+  GITLEAKS_VERSION: "8.30.1"
+  GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+
+jobs:
+  extension-guard:
+    name: extension-guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout reglas (rama base)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: trusted
+          persist-credentials: false
+
+      - name: Checkout código a revisar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.HEAD_REPO }}
+          ref: ${{ env.HEAD_SHA }}
+          path: pr
+          persist-credentials: false
+
+      - name: Avisar si el PR modifica .github
+        run: |
+          changes=$(diff -rq trusted/.github pr/.github 2>&1 || true)
+          if [ -n "$changes" ]; then
+            echo "::warning::Este PR modifica .github (workflows, reglas o listas permitidas). Revisarlo con cuidado: los cambios no se aplican a los checks hasta mergear."
+            { echo "### ⚠️ Cambios en .github"; echo '```'; echo "$changes"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Instalar Semgrep
+        run: pipx install "semgrep==${SEMGREP_VERSION}"
+
+      - name: Semgrep (reglas de la extensión)
+        run: |
+          # Un PR no puede excluir archivos del análisis con su propio .semgrepignore
+          find pr -name .semgrepignore -delete
+          semgrep scan \
+            --config trusted/.github/semgrep/extension-js.yml \
+            --config trusted/.github/semgrep/extension-web.yml \
+            --metrics=off --disable-nosem --no-git-ignore --error \
+            --exclude .github/semgrep \
+            pr
+
+      - name: Tests de las reglas (versión del PR)
+        run: semgrep scan --test --metrics=off pr/.github/semgrep
+
+      - name: Permisos del manifest
+        run: node trusted/.github/scripts/check-manifest.mjs pr trusted/.github/security/manifest-allowlist.json
+
+  web-ext-lint:
+    name: web-ext-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout scripts (rama base)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: trusted
+          persist-credentials: false
+
+      - name: Checkout código a revisar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.HEAD_REPO }}
+          ref: ${{ env.HEAD_SHA }}
+          path: pr
+          persist-credentials: false
+
+      - name: web-ext lint
+        # Se ejecuta desde RUNNER_TEMP y sin config discovery para que no se
+        # lea ningún .npmrc, package.json ni web-ext-config del PR.
+        working-directory: ${{ runner.temp }}
+        run: |
+          npx --yes "web-ext@${WEB_EXT_VERSION}" lint \
+            --source-dir "$GITHUB_WORKSPACE/pr" \
+            --no-config-discovery \
+            --ignore-files '.github/**' \
+            --output json > lint.json || true
+          jq -e '.summary' lint.json > /dev/null
+
+      - name: Comparar con la línea base
+        run: node trusted/.github/scripts/check-web-ext.mjs "$RUNNER_TEMP/lint.json" trusted/.github/security/web-ext-baseline.json
+
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout código a revisar
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.HEAD_REPO }}
+          ref: ${{ env.HEAD_SHA }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Instalar gitleaks
+        working-directory: ${{ runner.temp }}
+        run: |
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfL -o "$tarball" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${tarball}"
+          echo "${GITLEAKS_SHA256}  ${tarball}" | sha256sum -c -
+          tar -xzf "$tarball" gitleaks
+
+      - name: Buscar secretos
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          # Un PR no puede silenciar hallazgos con su propia configuración
+          rm -f pr/.gitleaks.toml pr/.gitleaksignore
+          if [ -n "$BASE_SHA" ]; then
+            git -C pr fetch --no-tags --quiet "https://github.com/${GITHUB_REPOSITORY}.git" "$BASE_SHA"
+            range="${BASE_SHA}..${HEAD_SHA}"
+          elif [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            range="${BEFORE_SHA}..${HEAD_SHA}"
+          else
+            range="--all"
+          fi
+          echo "Rango revisado: $range"
+          "$RUNNER_TEMP/gitleaks" git pr --log-opts="$range" --redact --no-banner --exit-code 1

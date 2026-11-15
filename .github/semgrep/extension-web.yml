@@ -1,0 +1,67 @@
+# Reglas de seguridad propias de Better Aula (texto de JS, CSS y HTML).
+#
+# La extensión corre dentro de aula.usm.cl (sesión de Moodle de la persona), así
+# que cualquier envío de datos fuera del navegador o ejecución de código dinámico
+# es una señal de alerta. Si una regla bloquea un cambio legítimo, el ajuste se
+# hace en un PR aparte que modifique este archivo: el workflow siempre usa las
+# reglas de la rama base, nunca las del PR.
+
+rules:
+  # ----------------------------------------------------------------------------
+  # URLs externas. Solo se permiten las de esta lista (namespaces de SVG y el
+  # repositorio del proyecto). Aplica a JS, CSS y HTML.
+  # ----------------------------------------------------------------------------
+  - id: ba-external-url
+    languages: [generic]
+    severity: ERROR
+    message: >-
+      URL externa no permitida. Agregar el dominio a la lista blanca de
+      .github/semgrep/extension.yml en un PR aparte si es legítimo.
+    paths:
+      include:
+        - "*.js"
+        - "*.mjs"
+        - "*.cjs"
+        - "*.css"
+        - "*.html"
+        - "*.htm"
+        - "*.svg"
+    pattern-regex: (?i)(?:\b(?:https?|wss?|ftp):)?//(?!www\.w3\.org/(?:2000/svg|1999/xlink)\b|github\.com/lyoss-usm/betteraula\b)[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::\d+)?(?:[/?#]|["'`)\s])
+
+  # ----------------------------------------------------------------------------
+  # CSS: sin recursos remotos ni selectores capaces de filtrar lo que se
+  # escribe en un input (CSS keylogger). Aplica a CSS y a CSS embebido en JS.
+  # ----------------------------------------------------------------------------
+  - id: ba-css-exfiltration
+    languages: [generic]
+    severity: ERROR
+    message: >-
+      CSS no permitido: @import, url() a recursos no locales o selectores de
+      atributo sobre el valor de inputs.
+    paths:
+      include:
+        - "*.css"
+        - "*.js"
+        - "*.html"
+    pattern-either:
+      - pattern-regex: (?i)@import\b
+      - pattern-regex: (?i)(?<![\w.$])url\((?>\s*\\?["']?\s*)(?!data:image/|chrome-extension:|moz-extension:|\)|\$\{|\\?["']\s*\+|\.{0,2}/?[\w-]+(?:/[\w.-]+)*\.(?:png|jpe?g|gif|webp|svg)\b)
+      - pattern-regex: (?i)\[\s*value\s*[~|^$*]?=
+
+  # ----------------------------------------------------------------------------
+  # HTML de la extensión: scripts solo como archivos .js locales.
+  # ----------------------------------------------------------------------------
+  - id: ba-html-script
+    languages: [generic]
+    severity: ERROR
+    message: >-
+      En el HTML de la extensión solo se permiten <script src="archivo.js">
+      locales (sin scripts inline, iframes, objects ni handlers on*=).
+    paths:
+      include:
+        - "*.html"
+        - "*.htm"
+    pattern-either:
+      - pattern-regex: (?i)<script(?![^>]*\bsrc\s*=\s*["'][\w./-]+\.js["'])[^>]*>
+      - pattern-regex: (?i)<(?:iframe|object|embed|frame|base|meta\s+http-equiv)\b
+      - pattern-regex: (?i)\son[a-z]+\s*=

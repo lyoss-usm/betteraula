@@ -1,0 +1,11 @@
+<!-- Casos de prueba de las reglas (semgrep --test). No es parte de la extensión. -->
+<!-- ok: ba-html-script -->
+<script src="popup.js"></script>
+<!-- ruleid: ba-html-script -->
+<script>alert(1)</script>
+<!-- ruleid: ba-html-script, ba-external-url -->
+<script src="https://evil.example/x.js"></script>
+<!-- ruleid: ba-html-script -->
+<iframe src="about:blank"></iframe>
+<!-- ruleid: ba-html-script -->
+<img src="x.png" onerror="steal()">

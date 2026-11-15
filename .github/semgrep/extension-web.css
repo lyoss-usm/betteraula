@@ -1,0 +1,17 @@
+/* Casos de prueba de las reglas (semgrep --test). No es parte de la extensión.
+   Las anotaciones usan // porque es lo que reconoce semgrep --test. */
+
+// ruleid: ba-css-exfiltration
+@import url("x.css");
+
+// ruleid: ba-css-exfiltration
+input[type="password"][value$="a"] { background: red; }
+
+// ruleid: ba-css-exfiltration, ba-external-url
+.x { background-image: url(https://evil.example/a.png); }
+
+// ok: ba-css-exfiltration
+.y { background-image: url("data:image/svg+xml,%3Csvg%3E"); }
+
+// ok: ba-css-exfiltration
+.z { background: url(images/default1.jpg); }

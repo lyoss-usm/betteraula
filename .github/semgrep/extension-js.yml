@@ -1,0 +1,120 @@
+# Reglas de seguridad propias de Better Aula (código JavaScript).
+#
+# La extensión corre dentro de aula.usm.cl (sesión de Moodle de la persona), así
+# que cualquier envío de datos fuera del navegador o ejecución de código dinámico
+# es una señal de alerta. Si una regla bloquea un cambio legítimo, el ajuste se
+# hace en un PR aparte que modifique este archivo: el workflow siempre usa las
+# reglas de la rama base, nunca las del PR.
+
+rules:
+  # ----------------------------------------------------------------------------
+  # Red: la extensión no habla con servidores. Solo puede leer sus propios
+  # recursos con chrome.runtime.getURL().
+  # ----------------------------------------------------------------------------
+  - id: ba-network-request
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Petición de red no permitida. Better Aula no envía ni recibe datos de
+      servidores; solo puede hacer fetch() de recursos propios con
+      chrome.runtime.getURL().
+    patterns:
+      - pattern-either:
+          - pattern: fetch(...)
+          - pattern: window.fetch(...)
+          - pattern: new XMLHttpRequest(...)
+          - pattern: navigator.sendBeacon(...)
+          - pattern: new WebSocket(...)
+          - pattern: new EventSource(...)
+          - pattern: new RTCPeerConnection(...)
+          - pattern: $X.postMessage(...)
+          - pattern: chrome.runtime.connectNative(...)
+          - pattern: chrome.runtime.sendNativeMessage(...)
+      - pattern-not: fetch(chrome.runtime.getURL(...), ...)
+      - pattern-not-inside: |
+          var $U = chrome.runtime.getURL(...);
+          ...
+      - pattern-not-inside: |
+          const $U = chrome.runtime.getURL(...);
+          ...
+
+  # ----------------------------------------------------------------------------
+  # Ejecución de código dinámico u ofuscado.
+  # ----------------------------------------------------------------------------
+  - id: ba-dynamic-code
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Ejecución de código dinámico no permitida (eval, Function, import(),
+      scripts inyectados o timers con string).
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: window.eval(...)
+      - pattern: new Function(...)
+      - pattern: Function(...)
+      - pattern: setTimeout("...", ...)
+      - pattern: setInterval("...", ...)
+      - pattern: import(...)
+      - pattern: importScripts(...)
+      - pattern: document.createElement("script")
+      - pattern: document.createElement("iframe")
+      - pattern: document.createElement("object")
+      - pattern: document.createElement("embed")
+      - pattern: chrome.scripting.$F(...)
+      - pattern: chrome.tabs.executeScript(...)
+
+  - id: ba-obfuscation
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Decodificación de strings típica de código ofuscado (atob, fromCharCode,
+      unescape). Si es legítimo, explicarlo en el PR.
+    pattern-either:
+      - pattern: atob(...)
+      - pattern: window.atob(...)
+      - pattern: String.fromCharCode(...)
+      - pattern: unescape(...)
+
+  # ----------------------------------------------------------------------------
+  # Datos sensibles de la sesión de Moodle.
+  # ----------------------------------------------------------------------------
+  - id: ba-session-data
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Acceso a datos de sesión (cookies, sesskey, M.cfg, storage de la página).
+      Better Aula no debe leer credenciales ni datos de sesión.
+    pattern-either:
+      - pattern: document.cookie
+      - pattern: chrome.cookies
+      - pattern: browser.cookies
+      - pattern: M.cfg
+      - pattern: window.M
+      - pattern: $X.sesskey
+      - pattern: localStorage
+      - pattern: sessionStorage
+      - pattern-regex: (?i)sesskey
+
+  - id: ba-login-form-access
+    languages: [javascript]
+    severity: ERROR
+    message: >-
+      Acceso a formularios o campos de inicio de sesión. Better Aula solo puede
+      cambiar elementos decorativos de la página de login.
+    pattern-either:
+      - pattern: document.forms
+      - pattern: $X.addEventListener("submit", ...)
+      - pattern: $X.onsubmit = $F
+      - pattern: $X.requestSubmit(...)
+      - pattern: new FormData(...)
+      - patterns:
+          - pattern-either:
+              - pattern: $X.querySelector($SEL)
+              - pattern: $X.querySelectorAll($SEL)
+              - pattern: $X.getElementById($SEL)
+              - pattern: $X.getElementsByName($SEL)
+              - pattern: $X.getElementsByTagName($SEL)
+          - metavariable-regex:
+              metavariable: $SEL
+              # metavariable-regex se ancla al inicio: por eso el .* explícito.
+              regex: (?i)(^["'`]?(form|input)\b|.*(password|passwd|\busername\b|#login\b|login(btn|form)|token|input\[|\bform[\[#.:\s]))
