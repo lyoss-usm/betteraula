@@ -438,7 +438,7 @@
     '    </span>',
     '    <div>',
     '      <div class="ba-title">Better Aula</div>',
-    '      <div class="ba-version">v1.0</div>',
+    '      <div class="ba-version">v' + VERSION + '</div>',
     '    </div>',
     '  </div>',
     '  <button id="ba-close-btn" aria-label="Cerrar panel Better Aula">',
@@ -554,7 +554,7 @@
 
     /* Footer */
     '<div id="ba-footer">',
-    '  <div>Better Aula v1.0 &mdash; Aula USM</div>',
+    '  <div>Better Aula v' + VERSION + ' &mdash; Aula USM</div>',
     '  <div style="margin-top:4px; font-size: 10px; color: #6b7280; font-weight: 500;">Desarrollado por Mauro Castillo</div>',
     '  <div style="margin-top:8px">',
     '    <a href="' + ISSUES_URL + '" target="_blank" rel="noopener noreferrer">',
