@@ -1,0 +1,45 @@
+{
+  "_comment": "Superficie permitida del manifest.json. El check falla si un PR agrega permisos, hosts, claves o recursos que no estén aquí. Reducir siempre está permitido. Ampliar requiere un PR aparte que modifique este archivo (el workflow usa la versión de la rama base).",
+  "manifest_version": 3,
+  "allowed_keys": [
+    "manifest_version",
+    "name",
+    "short_name",
+    "version",
+    "version_name",
+    "author",
+    "description",
+    "homepage_url",
+    "default_locale",
+    "minimum_chrome_version",
+    "icons",
+    "permissions",
+    "host_permissions",
+    "action",
+    "content_scripts",
+    "web_accessible_resources",
+    "browser_specific_settings"
+  ],
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://aula.usm.cl/*"
+  ],
+  "content_script_matches": [
+    "*://aula.usm.cl/*"
+  ],
+  "web_accessible_resources": {
+    "resources": [
+      "images/*",
+      "logousmletrasblancas.png"
+    ],
+    "matches": [
+      "*://aula.usm.cl/*"
+    ]
+  },
+  "gecko_data_collection_required": [
+    "none"
+  ]
+}
