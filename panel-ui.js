@@ -296,6 +296,34 @@
     '}',
     '.ba-select:focus { outline: none; border-color: #3b82f6; }',
 
+    /* ---- Página de inicio de sesión ---- */
+    '.ba-field-label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 6px; }',
+    '.ba-secondary-btn {',
+    '  width: 100%;',
+    '  margin-top: 8px;',
+    '  padding: 7px;',
+    '  background: transparent;',
+    '  color: #3b82f6;',
+    '  border: 1px solid #3b82f6;',
+    '  border-radius: 8px;',
+    '  font-size: 12px;',
+    '  font-weight: 600;',
+    '  cursor: pointer;',
+    '}',
+    '.ba-secondary-btn:hover { background: rgba(59, 130, 246, 0.08); }',
+    '.ba-check {',
+    '  display: flex;',
+    '  align-items: center;',
+    '  gap: 8px;',
+    '  margin-top: 10px;',
+    '  font-size: 13px;',
+    '  color: #374151;',
+    '  cursor: pointer;',
+    '}',
+    '.ba-check input { width: 15px; height: 15px; accent-color: #3b82f6; cursor: pointer; }',
+    '#ba-panel.ba-panel-dark .ba-check { color: #d1d5db; }',
+    '#ba-panel.ba-panel-dark .ba-field-label { color: #9ca3af; }',
+
     '#ba-auto-time-container {',
     '  margin-top: 10px;',
     '  display: none;',
@@ -545,6 +573,20 @@
     '  </div>',
     '</div>',
 
+    /* Sección: Página de inicio de sesión (portada de Aula) */
+    '<div class="ba-section" id="ba-login-section">',
+    '  <div class="ba-section-title">Página de inicio de sesión</div>',
+    '  <label class="ba-field-label" for="ba-login-hero-select">Imagen principal</label>',
+    '  <select id="ba-login-hero-select" class="ba-select">',
+    '    <option value="default">Original de Aula</option>',
+    '    <option value="image">Mi imagen</option>',
+    '  </select>',
+    '  <button id="ba-login-hero-pick" class="ba-secondary-btn" type="button" style="display:none">Elegir imagen</button>',
+    '  <label class="ba-check"><input type="checkbox" id="ba-login-hide-newuser"> Ocultar el recuadro &laquo;¿Nuevo aquí?&raquo;</label>',
+    '  <label class="ba-check"><input type="checkbox" id="ba-login-hide-logos"> Ocultar logos institucionales</label>',
+    '  <label class="ba-check"><input type="checkbox" id="ba-login-compact"> Diseño compacto</label>',
+    '</div>',
+
     /* Sección: Ramos ocultos */
     '<div class="ba-section">',
     '  <div class="ba-section-title">Ramos ocultos</div>',
@@ -766,10 +808,13 @@
 
       /* Hidratar controles con valores actuales del storage */
       chrome.storage.local.get(
-        ['uiThemeConfig', 'darkModeConfig', 'hiddenCourses', 'savedCustomThemes'],
+        ['uiThemeConfig', 'darkModeConfig', 'hiddenCourses', 'savedCustomThemes', 'loginPageConfig'],
         function (prefs) {
           if (BA.ThemeEngine && typeof BA.ThemeEngine.hydrate === 'function') {
             BA.ThemeEngine.hydrate(prefs, _shadow);
+          }
+          if (BA.LoginTheme && typeof BA.LoginTheme.hydrate === 'function') {
+            BA.LoginTheme.hydrate(prefs.loginPageConfig, _shadow);
           }
           BA.PanelUI.renderHiddenList(prefs.hiddenCourses || []);
           BA.PanelUI.renderSavedThemes(prefs.savedCustomThemes || []);

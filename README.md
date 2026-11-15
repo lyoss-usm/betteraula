@@ -6,7 +6,7 @@
 
 **Personalización para el Moodle de la USM.**
 
-![Version](https://img.shields.io/badge/Versión-1.0.0-blue)
+![Version](https://img.shields.io/badge/Versión-1.1.0-blue)
 ![License](https://img.shields.io/badge/Licencia-MIT-green)
 ![Chrome](https://img.shields.io/badge/Plataforma-Chrome-orange)
 ![Firefox](https://img.shields.io/badge/Plataforma-Firefox-red)
@@ -20,6 +20,7 @@ Better Aula es una extensión de navegador construida para transformar y moderni
 *   **Modo Oscuro Integrado:** Soporte nativo para modo oscuro, con opciones de activación manual o programación automática basada en horarios.
 *   **Gestión de Cursos:** Capacidad para renombrar asignaturas con etiquetas personalizadas y ocultar/mostrar ramos específicos para mantener un panel de control limpio.
 *   **Sistema de Fondos Multimedia:** Soporte para personalizar las tarjetas de los cursos utilizando imágenes locales o gradientes de malla (mesh gradients) animados.
+*   **Página de inicio de sesión personalizada:** La portada de Aula (la que aparece antes de iniciar sesión) usa tu tema y tu modo oscuro. Puedes cambiar la imagen principal por una tuya o por un gradiente, ocultar el recuadro «¿Nuevo aquí?» y los logos institucionales, y activar un diseño compacto. En esa página, el botón **Better Aula** del menú superior abre el panel. La extensión no lee ni modifica los formularios ni los botones de inicio de sesión.
 *   **Optimización de Rendimiento:** Utilización de IndexedDB para el almacenamiento en caché de imágenes y recursos multimedia, garantizando una carga instantánea y reduciendo la redundancia de red.
 
 ## Privacidad y Seguridad
