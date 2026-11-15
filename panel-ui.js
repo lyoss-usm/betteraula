@@ -8,7 +8,7 @@
   // Enlaces y versión. Cambiar REPO_URL aquí si el repositorio se mueve
   // (p. ej. a la organización LYOSS).
   // ------------------------------------------------------------------
-  var REPO_URL = 'https://github.com/muitomou/betteraula';
+  var REPO_URL = 'https://github.com/lyoss-usm/betteraula';
   var ISSUES_URL = REPO_URL + '/issues';
   var VERSION = (chrome.runtime.getManifest && chrome.runtime.getManifest().version) || '';
 

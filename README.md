@@ -6,6 +6,8 @@
 
 **Personalización para el Moodle de la USM.**
 
+> Creado por Mauro Castillo ([@muitomou](https://github.com/muitomou)). Repo original: https://github.com/muitomou/betteraula · Mantenido por la comunidad [LYOSS](https://github.com/lyoss-usm).
+
 ![Version](https://img.shields.io/badge/Versión-1.1.0-blue)
 ![License](https://img.shields.io/badge/Licencia-MIT-green)
 ![Chrome](https://img.shields.io/badge/Plataforma-Chrome-orange)
@@ -49,18 +51,20 @@ Si deseas compilar la extensión o probarla en modo desarrollador:
 Better Aula es un proyecto de código abierto mantenido por y para la comunidad estudiantil. Toda ayuda es bienvenida.
 
 ### Reportar errores o proponer ideas
-*   Abre un **Issue** en el repositorio describiendo qué pasó, los pasos para reproducirlo, el navegador y su versión y, si puedes, una captura (sin datos personales: tapa tu nombre, RUT o correo).
+*   Abre un **Issue** en [lyoss-usm/betteraula](https://github.com/lyoss-usm/betteraula/issues) describiendo qué pasó, los pasos para reproducirlo, el navegador y su versión y, si puedes, una captura (sin datos personales: tapa tu nombre, RUT o correo).
 
 ### Contribuir con código
 1.  Haz un fork del repositorio y crea una rama descriptiva (`fix/selector-navbar`, `feat/tema-login`, etc.).
 2.  Carga la extensión sin empaquetar (ver *Instalación para Desarrolladores*) y prueba tus cambios en Aula.
 3.  Mantén el estilo del proyecto: JavaScript sin dependencias, un módulo por responsabilidad bajo el namespace `window.BetterAula`, y nada de `console.log` en el código final.
 4.  Nunca leas, guardes ni envíes credenciales, cookies o `sesskey` de Moodle: toda la información debe quedarse en el navegador del usuario.
-5.  Abre un **Pull Request** explicando qué cambia y por qué.
+5.  Abre un **Pull Request** hacia [lyoss-usm/betteraula](https://github.com/lyoss-usm/betteraula) explicando qué cambia y por qué.
 
 ## Licencia y Créditos
 
 **Autor original:** Mauro Castillo, quien creó y desarrolló Better Aula.
+
+Creado por Mauro Castillo (@muitomou). Repo original: https://github.com/muitomou/betteraula
 
 Gracias a todas las personas que contribuyen con issues y pull requests.
 
